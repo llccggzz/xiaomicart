@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <title>Document</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* 顶部样式 */
+    .top {
+      display: flex;
+      align-items: center;
+    }
+
+    .top p {
+      margin-left: 25px;
+      font-size: 21px;
+    }
+
+    .top img {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    /* 商品图片 */
+    .goodsImg {
+      width: 80px;
+      height: 80px;
+      margin-right: 10px;
+    }
+
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /*  tr:nth-child(even) {
+      background-color: #f2f2f2;
+    } */
+
+    /* 数量输入框样式 */
+    input[type="text"] {
+      width: 40px;
+      text-align: center;
+      border: none;
+      padding: 3px;
+    }
+
+    input[type="checkbox"]:checked {
+      filter: sepia(100%) saturate(10);
+      background-color: orange;
+
+    }
+
+    .num {
+      border: 1px solid #ccc;
+      width: 100px;
+    }
+
+
+
+    /* 按钮样式 */
+    button {
+      padding: 5px 10px;
+      border: none;
+      background-color: white;
+      color: rgb(22, 22, 22);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: white;
+    }
+
+    /* 删除按钮样式 */
+    .del-btn {
+      background-color: red;
+    }
+
+    /* 总价样式 */
+    .totalPrice {
+
+      margin-top: 20px;
+      color: orange;
+    }
+
+    .totalPriceNum {
+      font-size: 30px;
+      color: orange;
+    }
+
+    .yuan {
+      color: orange;
+    }
+
+
+
+    .bottom {
+      display: flex;
+      align-items: center;
+
+    }
+
+
+
+    .bottom p:nth-child(3) {
+      margin-left: 1030px;
+      color: orange;
+    }
+
+    .bottom p:nth-child(2) {
+      font-size: 16px;
+      color: orange;
+      margin-top: 18px;
+    }
+
+    .bottom button {
+      margin-left: 1310px;
+      background-color: orange;
+      position: absolute;
+      width: 120px;
+      color: white;
+      height: 36px;
+
+    }
+
+    .xiaoji {
+      color: orange;
+    }
+
+    .border {
+      border-bottom: 3px solid orange;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="root"></div>
+  <template id="myRoot">
+    <div>
+      <div class="top">
+        <img src="./images/小米.png">
+        <p>我的购物车</p>
+      </div>
+      <div class="border"></div>
+      <table>
+        <tr>
+          <td><input type="checkbox" v-model="checkAll">全选</td>
+          <td></td>
+          <td>名称</td>
+
+          <td>单价</td>
+          <td>数量</td>
+          <td>小计</td>
+          <td>操作</td>
+        </tr>
+
+        <tr v-for="g,index in goods" :key="g.id">
+          <td><input type="checkbox" v-model="g.isChecked"></td>
+          <td><img class="goodsImg" :src="g.img"></td>
+          <td>{{g.name}}</td>
+          <td>{{g.price}}元</td>
+          <td>
+            <div class="num">
+              <button type="button" @click="reduce(index)">-</button>
+              <input type="text" :value="g.num">
+              <button type="button" @click="add(index)">+</button>
+              <!-- {{g.num}} -->
+            </div>
+
+          </td>
+
+          <td class="xiaoji">{{g.price*g.num}}元</td>
+          <td>
+            <button @click="del(g.id)">×</button>
+          </td>
+        </tr>
+      </table>
+      <div class="bottom">
+        <p>已选择
+        <p class="checkedNum">{{checkedNum}}</p>件商品</p>
+        <p class="totalPrice">
+          合计：
+        <p class="totalPriceNum">{{totalPrice}}</p>
+        <p class="yuan">元</p>
+        </p>
+        <button>去结算</button>
+      </div>
+
+    </div>
+  </template>
+  <script>
+    const app = Vue.createApp({
+      template: '#myRoot',
+      data() {
+        return {
+          goods: [
+            { id: 1, isChecked: false, img: './images/洗衣机.png', name: '洗衣机', price: 3600, num: 1 },
+            { id: 2, isChecked: false, img: './images/冰箱.png', name: '冰箱', price: 5600, num: 1 },
+            { id: 3, isChecked: false, img: './images/破壁机.png', name: '破壁机', price: 2300, num: 1 },
+            { id: 4, isChecked: false, img: './images/烤箱.png', name: '烤箱', price: 3000, num: 1 },
+            { id: 5, isChecked: false, img: './images/空气炸锅.png', name: '空气炸锅', price: 1999, num: 1 }
+          ],
+          num: 0
+        }
+      },
+      computed: {
+        checkAll: {
+          get() {
+            return this.goods.every(g => g.isChecked)
+          },
+          set(value) {
+            this.goods.forEach(g => {
+              g.isChecked = value
+            })
+          }
+        },
+        totalPrice() {
+          let sum = 0
+          this.goods.forEach(g => {
+            if (g.isChecked) {
+              sum += g.price * g.num
+            }
+
+          })
+          return sum
+        },
+        checkedNum() {
+          let checkedNum = 0
+          this.goods.forEach(g => {
+            if (g.isChecked) {
+              checkedNum += g.num
+            }
+          })
+          return checkedNum
+        },
+      },
+      methods: {
+        add(id) {
+          this.goods[id].num++
+        },
+        reduce(id) {
+          if (this.goods[id].num > 0) {
+            this.goods[id].num--
+          }
+        },
+        del(id) {
+          this.goods = this.goods.filter(g => g.id !== id)
+        }
+      }
+    })
+    const vm = app.mount('.root')
+  </script>
+</body>
+
+</html>
